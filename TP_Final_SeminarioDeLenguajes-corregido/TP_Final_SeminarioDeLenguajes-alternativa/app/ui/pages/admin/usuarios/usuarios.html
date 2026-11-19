@@ -1,0 +1,63 @@
+{% extends "components/base/layout.html" %}
+
+{% block title %}Administración - Usuarios{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin-tablas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Administración de Usuarios</h1>
+
+    <div class="admin-header">
+        <a href="{{ url_for('admin_usuario_nuevo') }}" class="btn btn-primary">Agregar Usuario</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>idUsuario</th>
+                <th>nombreUsuario</th>
+                <th>nombre</th>
+                <th>apellido</th>
+                <th>email</th>
+                <th>Tipo</th>
+                <th>domicilio</th>
+                <th>telefono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.id_usuario }}</td>
+                    <td>{{ usuario.nombre_usuario }}</td>
+                    <td>{{ usuario.nombre }}</td>
+                    <td>{{ usuario.apellido }}</td>
+                    <td>{{ usuario.email }}</td>
+                    <td>{{ usuario.rol|capitalize }}</td>
+                    <td>{{ usuario.domicilio if usuario.rol == 'cliente' else '-' }}</td>
+                    <td>{{ usuario.telefono if usuario.rol == 'cliente' else '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('admin_usuario_modificar', id_usuario=usuario.id_usuario) }}"
+                           class="btn btn-small btn-secondary">Modificar</a>
+                        {% if usuario.id_usuario != session.get('id_usuario') %}
+                            <form method="post" class="inline-form"
+                                  action="{{ url_for('admin_usuario_eliminar', id_usuario=usuario.id_usuario) }}"
+                                  onsubmit="return confirm('¿Eliminar al usuario {{ usuario.nombre_usuario }}?');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-small btn-danger">Eliminar</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="9" class="tabla-vacia">No hay usuarios registrados.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
